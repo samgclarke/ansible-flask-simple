@@ -1,0 +1,73 @@
+---
+- hosts: "{{ target }}"
+  vars_files:
+    - vars/vars.yml
+  remote_user: "{{ root_user }}"
+  become: true
+  gather_facts: no
+  pre_tasks:
+    - name: 'Install python2'
+      raw: sudo apt-get -y install python-simplejson
+
+    - name: resgister ip
+      shell: wget -qO- http://ipecho.net/plain ; echo
+      register: host_ip
+
+  roles:
+    - { role: systemd }
+    - { role: nginx, template: 'templates/nginx/nginx.conf.j2' }
+    - { role: ssh }
+
+  tasks:
+    - name: Install system packages
+      apt: name={{ item }} state=present
+      with_items:
+        - python-pip
+        - python-dev
+        - libffi-dev
+        - libpq-dev
+        - git
+        - nodejs
+        - build-essential
+        - npm
+
+#  CLONE REPO
+- hosts: "{{ target }}"
+  remote_user: "{{ remote_user }}"
+  vars_files:
+    - vars/vars.yml
+  roles:
+    - git
+
+  tasks:
+    #  BUILD
+    #  npm packages from package.json
+    - name: Install npm packages based on package.json.
+      command: npm install
+      args:
+        chdir: /home/{{ remote_user }}/{{ app }}
+      register: result
+      failed_when: "result.stderr is defined and 'ERR!' in result.stderr"
+
+    #  Build for www
+    - name: NPM build.
+      shell: "npm run build"
+      args:
+        chdir: /home/{{ remote_user }}/{{ app }}
+
+#  FINAL TASKS
+- hosts: "{{ target }}"
+  remote_user: "{{ root_user }}"
+  become: true
+  vars_files:
+    - vars/vars.yml
+  roles:
+    - virtualenv
+
+  tasks:
+    - name: Ensure gunicorn service is started and enabled
+      systemd:
+        name: gunicorn
+        state: started
+        enabled: True
+        daemon_reload: yes

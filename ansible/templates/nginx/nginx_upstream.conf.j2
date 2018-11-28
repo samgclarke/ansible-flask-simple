@@ -1,0 +1,31 @@
+server {
+    listen 80;
+    server_name {{ ansible_eth0.ipv4.address }};
+
+    # increase upload limit
+    # 10K, 8m
+    client_body_buffer_size 10K;
+    client_max_body_size 8m;
+    keepalive_timeout 0;
+    proxy_connect_timeout 1200s;
+    proxy_read_timeout 1200s;
+    # custom header for streaming audio
+    add_header Accept-Ranges bytes;
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/{{ remote_user }}/{{ app }}/{{ app }}.sock;
+    }
+
+    error_page 500 502 503 504 /custom_50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html;
+        internal;
+    }
+
+    location /testing {
+        fastcgi_pass unix:/does/not/exist;
+    }
+}
+
+

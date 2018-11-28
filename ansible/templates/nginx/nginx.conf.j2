@@ -1,0 +1,25 @@
+server {
+    listen 80;
+    server_name {{ server_name }};
+
+    #location /dist {
+    #    alias /home/sam/burner/dist;
+    #}
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/{{ remote_user }}/{{ app }}/{{ app }}.sock;
+    }
+
+    error_page 500 502 503 504 /custom_50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html;
+        internal;
+    }
+
+    location /testing {
+        fastcgi_pass unix:/does/not/exist;
+    }
+}
+
+

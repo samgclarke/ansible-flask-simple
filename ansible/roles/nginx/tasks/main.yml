@@ -1,0 +1,31 @@
+---
+#  SYSTEM PACKAGES
+- name: Update apt
+  apt: update_cache=yes
+
+- name: Install system packages
+  apt: name={{ item }} state=present
+  with_items:
+    - nginx
+
+#  NGINX
+- name: Copy nginx configuration in place.
+  template:
+    src: "{{ template }}"
+    dest: "/etc/nginx/sites-available/{{ app }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+- name: Disable default server
+  file: path=/etc/nginx/sites-enabled/default state=absent
+- name: Create symlink to nginx conf
+  file: src="/etc/nginx/sites-available/{{ app }}.conf"
+        dest="/etc/nginx/sites-enabled/{{ app }}.conf"
+        owner=root
+        group=root
+        state=link
+
+- name: NGINX | Starting NGINX
+  service:
+    name: nginx
+    state: restarted

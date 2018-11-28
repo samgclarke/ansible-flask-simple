@@ -1,0 +1,10 @@
+---
+#  VIRTUALENV
+- name: Install virtualenv
+  pip: name=virtualenv
+
+- name: Setup virtualenv
+  pip:
+    requirements: /home/{{ remote_user }}/{{ app }}/requirements.txt
+    virtualenv: /home/{{ remote_user }}/.envs/{{ app }}
+    #virtualenv_python: python3.7

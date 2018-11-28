@@ -1,0 +1,15 @@
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+
+[Service]
+User={{ remote_user }}
+Group=www-data
+WorkingDirectory=/home/{{ remote_user }}/{{ project }}
+###EnvironmentFile=/etc/environment
+ExecStart=/home/{{ remote_user }}/.envs/{{ project }}/bin/gunicorn --access-logfile - --workers 3 --bind unix:{{ app }}.sock wsgi:app
+PrivateTmp=false
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,18 @@
+---
+#  ENVIRONMENT VARIABLES
+- name: Copy environment configuration in place.
+  template:
+    src: templates/environment.j2
+    dest: "/etc/environment"
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+    mode: 0644
+
+#  UPSTART - GUNICORN
+- name: Copy upstart Gunicorn configuration in place.
+  template:
+    src: templates/upstart/upstart.gunicorn.conf.j2
+    dest: "/etc/init/gunicorn.conf"
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+    mode: 0755

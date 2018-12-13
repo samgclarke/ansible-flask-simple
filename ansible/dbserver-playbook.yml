@@ -1,0 +1,43 @@
+---
+- hosts: "{{ target }}"
+  vars_files:
+    - vars/vars.yml
+  remote_user: root
+  gather_facts: no
+
+  pre_tasks:
+    # --- Ubuntu 16.04 doesn't have python 2.7 by default
+    - name: install python 2
+      raw: sudo apt-get -y install python-simplejson
+
+  roles:
+    - { role: postgres }
+
+  tasks:
+    - name: Ensure the PostgreSQL service is running
+      service: name=postgresql
+               state=started
+               enabled=yes
+
+
+- hosts: "{{ target }}"
+  vars_files:
+    - vars/vars.yml
+  remote_user: root
+  become_user: postgres
+  become: yes
+
+  tasks:
+    - name: ensure database is created
+      postgresql_db: name={{ app }}
+
+    - name: ensure user has access to database
+      postgresql_user: db={{ app }}
+                       name={{ db_user }}
+                       password={{ db_password }}
+                       encrypted=yes
+                       priv=ALL
+
+    - name: ensure user does not have unnecessary privilege
+      postgresql_user: name={{ db_user }}
+                       role_attr_flags=NOSUPERUSER,NOCREATEDB

@@ -1,0 +1,24 @@
+---
+- name: Update apt
+  apt: update_cache=yes
+
+- name: Install system packages
+  apt: name={{ item }} state=present
+  with_items:
+    - postgresql
+    - postgresql-contrib
+    - python-psycopg2
+    - sshpass
+
+#  UPDATE POSTGRES USER PWD
+- name: Update user postgres pwd
+  user: name=postgres password={{ remote_user_password |password_hash('sha512') }} state=present generate_ssh_key=yes shell=/bin/bash
+
+#  Postgres backup script
+#- name: Copy pg.backup in place.
+#  template:
+#    src: templates/postgres/pg_backup.sh
+#    dest: "/{{ root_user }}"
+#    owner: "{{ root_user }}"
+#    group: "{{ root_user }}"
+#    mode: 0644

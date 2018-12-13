@@ -1,0 +1,14 @@
+# env vars
+APP_SETTINGS="{{ app }}.config.StagingConfig"
+ROOT_URL="{{ http_protocol }}://{{ server_name }}"
+
+#  DB: Local
+DATABASE_URL="postgres://{{ db_user }}:{{ db_password }}@localhost/{{ app }}"
+
+APP_MAIL_USERNAME="{{ email_username }}"
+APP_MAIL_PASSWORD="{{ email_password }}"
+MAIL_DEFAULT_SENDER="{{ email_username }}"
+
+RUNTESTS="false"
+LOGGING_URL="logs3.papertrailapp.com:13806"
+CONTACT_EMAIL="samclarke.g@gmail.com"

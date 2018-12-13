@@ -7,7 +7,7 @@ After=network.target
 User={{ remote_user }}
 Group=www-data
 WorkingDirectory=/home/{{ remote_user }}/{{ project }}
-###EnvironmentFile=/etc/environment
+EnvironmentFile=/etc/environment
 ExecStart=/home/{{ remote_user }}/.envs/{{ project }}/bin/gunicorn --access-logfile - --workers 3 --bind unix:{{ app }}.sock wsgi:app
 PrivateTmp=false
 

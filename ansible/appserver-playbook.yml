@@ -9,7 +9,7 @@
     - name: 'Install python2'
       raw: sudo apt-get -y install python-simplejson
 
-    - name: resgister ip
+    - name: register ip
       shell: wget -qO- http://ipecho.net/plain ; echo
       register: host_ip
 
@@ -45,7 +45,7 @@
     - name: Install npm packages based on package.json.
       command: npm install
       args:
-        chdir: /home/{{ remote_user }}/{{ app }}
+        chdir: /home/{{ remote_user }}/{{ project }}
       register: result
       failed_when: "result.stderr is defined and 'ERR!' in result.stderr"
 
@@ -53,7 +53,7 @@
     - name: NPM build.
       shell: "npm run build"
       args:
-        chdir: /home/{{ remote_user }}/{{ app }}
+        chdir: /home/{{ remote_user }}/{{ project }}
 
 #  FINAL TASKS
 - hosts: "{{ target }}"
@@ -68,6 +68,21 @@
     - name: Ensure gunicorn service is started and enabled
       systemd:
         name: gunicorn
-        state: started
+        state: restarted
         enabled: True
         daemon_reload: yes
+
+    - name: createdb
+      shell: "/home/{{ remote_user }}/.envs/{{ project }}/bin/python manage.py createdb"
+      args:
+        chdir: "/home/{{ remote_user }}/{{ project }}"
+
+    - name: create_user
+      shell: "/home/{{ remote_user }}/.envs/{{ project }}/bin/python manage.py create_user"
+      args:
+        chdir: "/home/{{ remote_user }}/{{ project }}"
+
+
+#  setup db
+
+

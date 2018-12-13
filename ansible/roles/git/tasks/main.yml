@@ -2,7 +2,7 @@
 #  GIT CLONE
 - name: Clone project from git
   git: repo={{ git_repo }}
-       dest=/home/{{ remote_user }}/{{ app }}
+       dest=/home/{{ remote_user }}/{{ project }}
        remote=origin version={{ git_branch }}
        accept_hostkey=True
        key_file="/home/{{ remote_user }}/.ssh/id_rsa"

@@ -5,6 +5,6 @@
 
 - name: Setup virtualenv
   pip:
-    requirements: /home/{{ remote_user }}/{{ app }}/requirements.txt
-    virtualenv: /home/{{ remote_user }}/.envs/{{ app }}
+    requirements: /home/{{ remote_user }}/{{ project }}/requirements.txt
+    virtualenv: /home/{{ remote_user }}/.envs/{{ project }}
     #virtualenv_python: python3.7
